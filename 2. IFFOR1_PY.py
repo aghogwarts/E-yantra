@@ -1,10 +1,10 @@
 # cook your dish here
 
-T = int(input(""))
+T = int(input())
 
 if T in range(1,26):
     for x in range(0,(T)):
-        n = int(input(""))
+        n = int(input())
         if n in range(0,101):
             for i in range(0,n):
                 if i == 0:
