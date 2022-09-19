@@ -1,6 +1,7 @@
 # cook your dish here
 
 T = int(input(""))
+
 if T in range(1,26):
     for i in range(0,(T)):
         string=(input("")).lower()
