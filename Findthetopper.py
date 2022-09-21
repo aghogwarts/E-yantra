@@ -1,7 +1,7 @@
 T=int(input(""))
 no_stud=int(input(""))
 dictionary={}
-if T in range(1,26):
+if T in range(1,26) and no_stud in range(2,101):
     for i in range(0,no_stud):
         item=input("")
         x,y=item.split()
