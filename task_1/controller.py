@@ -13,7 +13,7 @@ import math
 # Odometry is given as a quaternion, but for the controller we'll need to find the orientaion theta by converting to euler angle
 from tf.transformations import euler_from_quaternion
 
-
+pi = math.pi
 hola_x = 0
 hola_y = 0
 hola_theta = 0
@@ -45,9 +45,9 @@ def main():
 	#Tolerances
 
 	#desired pose
-	x_d = 5
-	y_d = 5
-	theta_d = 1.5708
+	x_d = [1, -1, -1, 1, 0]
+	y_d = [1, 1, -1, -1, 0]
+	theta_d = [0.785, 2.335, -2.335, -0.785, 0]
 	
 	# desired pose Array index position
 	i = 0
@@ -69,7 +69,7 @@ def main():
 	# Need to find these values by tuning and trial-error.
 	kp_x = 0.5
 	kp_y = 0.5
-	kp_theta = 0.2
+	kp_theta = 0.3
 	
 	
 	# <This is explained below>
@@ -84,26 +84,29 @@ def main():
 	#control loop
 	
 	while not rospy.is_shutdown():
-
-		# 
 		# Find error (in x, y and theta) in global frame
 		# the /odom topic is giving pose of the robot in global frame
 		# the desired pose is declared above and defined by you in global frame
 		# therefore calculate error in global frame
-		e_x_g = x_d - hola_x
-		e_y_g = y_d - hola_y
-		e_theta_gl = theta_d - hola_theta
+		e_x_g = x_d[i] - hola_x
+		e_y_g = y_d[i] - hola_y
+		e_theta_gl = theta_d[i] - hola_theta
 
+
+		# if loop for stop condition and iteration
 		if((abs(e_x_g) <= 0.05) and (abs(e_y_g) <= 0.05) and (abs(e_theta_gl) <= 0.0174533)):
 			vel.linear.x = 0
 			vel.linear.y = 0
 			vel.angular.z = 0
 			pub.publish(vel)
 			rate.sleep()
-			break
-		
+			rospy.sleep(1)
+			if(i<len(x_d)):
+				i=i+1
+				continue
+			else:
+				break
 
- 
 		# (Calculate error in body frame)
 		# But for Controller outputs robot velocity in robot_body frame, 
 		# i.e. velocity are define is in x, y of the robot frame, 
@@ -133,8 +136,6 @@ def main():
 		vel.angular.z = vel_z
 		pub.publish(vel)
 		rate.sleep()
-		
-	
 		
 
 
