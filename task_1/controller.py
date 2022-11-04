@@ -45,9 +45,9 @@ def main():
 	#Tolerances
 
 	#desired pose
-	x_d = 0
-	y_d = 0
-	theta_d = 0
+	x_d = 5
+	y_d = 5
+	theta_d = 1.5708
 	
 	# desired pose Array index position
 	i = 0
@@ -67,9 +67,9 @@ def main():
 	vel_z = 0
 	
 	# Need to find these values by tuning and trial-error.
-	kp_x = 0
-	kp_y = 0
-	kp_theta = 0
+	kp_x = 0.5
+	kp_y = 0.5
+	kp_theta = 0.2
 	
 	
 	# <This is explained below>
@@ -95,6 +95,11 @@ def main():
 		e_theta_gl = theta_d - hola_theta
 
 		if((abs(e_x_g) <= 0.05) and (abs(e_y_g) <= 0.05) and (abs(e_theta_gl) <= 0.0174533)):
+			vel.linear.x = 0
+			vel.linear.y = 0
+			vel.angular.z = 0
+			pub.publish(vel)
+			rate.sleep()
 			break
 		
 
@@ -129,11 +134,7 @@ def main():
 		pub.publish(vel)
 		rate.sleep()
 		
-	vel.linear.x = 0
-	vel.linear.y = 0
-	vel.angular.z = 0
-	pub.publish(vel)
-	rate.sleep()
+	
 		
 
 
