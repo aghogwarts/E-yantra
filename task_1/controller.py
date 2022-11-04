@@ -13,7 +13,6 @@ import math
 # Odometry is given as a quaternion, but for the controller we'll need to find the orientaion theta by converting to euler angle
 from tf.transformations import euler_from_quaternion
 
-pi = math.pi
 hola_x = 0
 hola_y = 0
 hola_theta = 0
@@ -45,9 +44,9 @@ def main():
 	#Tolerances
 
 	#desired pose
-	x_d = [1, -1, -1, 1, 0]
-	y_d = [1, 1, -1, -1, 0]
-	theta_d = [0.785, 2.335, -2.335, -0.785, 0]
+	x_d = [5, -1, -1, 1, 0]
+	y_d = [5, 1, -1, -1, 0]
+	theta_d = [0.785, 0.785, -2.335, -0.785, 0]
 	
 	# desired pose Array index position
 	i = 0
@@ -67,9 +66,9 @@ def main():
 	vel_z = 0
 	
 	# Need to find these values by tuning and trial-error.
-	kp_x = 0.5
-	kp_y = 0.5
-	kp_theta = 0.3
+	kp_x = 0.2
+	kp_y = 0.2
+	kp_theta = 0.1
 	
 	
 	# <This is explained below>
@@ -92,20 +91,17 @@ def main():
 		e_y_g = y_d[i] - hola_y
 		e_theta_gl = theta_d[i] - hola_theta
 
-
 		# if loop for stop condition and iteration
-		if((abs(e_x_g) <= 0.05) and (abs(e_y_g) <= 0.05) and (abs(e_theta_gl) <= 0.0174533)):
+		if((abs(e_x_g) <= 0.05) and (abs(e_y_g) <= 0.05)):
+			print("Inside if condition")
 			vel.linear.x = 0
 			vel.linear.y = 0
 			vel.angular.z = 0
 			pub.publish(vel)
 			rate.sleep()
-			rospy.sleep(1)
-			if(i<len(x_d)):
-				i=i+1
-				continue
-			else:
-				break
+			rospy.sleep(5)
+			print("wait over")
+			break
 
 		# (Calculate error in body frame)
 		# But for Controller outputs robot velocity in robot_body frame, 
@@ -123,7 +119,14 @@ def main():
 		# to react to the error with velocities in x, y and theta.
 		vel_x = kp_x*e_x_l
 		vel_y = kp_y*e_y_l
-		vel_z = kp_theta*e_theta_gl
+
+		# if the tolerance is met then angular velocity will be zero, otherwise the P controller will run
+		if(abs(e_theta_gl) <= 0.0174533):
+			vel_z = 0
+			print("The theta P controller should stop")
+			break
+		else:
+			vel_z = kp_theta*e_theta_gl
 
 
 		# Safety Check
@@ -136,6 +139,8 @@ def main():
 		vel.angular.z = vel_z
 		pub.publish(vel)
 		rate.sleep()
+
+	print("out of while loop")
 		
 
 
